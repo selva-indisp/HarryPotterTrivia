@@ -1,6 +1,7 @@
 package com.indisp.harrypottertrivia
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.indisp.designsystem.theme.DsTheme
 import com.indisp.harrypottertrivia.navigation.Route
+import com.indisp.harrypottertrivia.search.ui.SearchItemDetailScreen
 import com.indisp.harrypottertrivia.search.ui.SearchScreen
 import com.indisp.harrypottertrivia.search.ui.SearchViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -27,6 +29,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DsTheme {
                 val navController = rememberNavController()
+                val searchViewModel: SearchViewModel = koinViewModel()
                 NavHost(
                     navController = navController,
                     startDestination = Route.SEARCH_SCREEN.name,
@@ -56,16 +59,19 @@ class MainActivity : ComponentActivity() {
                     },
                 ) {
                     composable(Route.SEARCH_SCREEN.name) {
-                        val searchViewModel: SearchViewModel = koinViewModel()
                         SearchScreen(
                             screenStateFlow = searchViewModel.screenStateFlow,
                             sideEffectFlow = searchViewModel.sideEffectFlow,
+                            navController = navController,
                             onEvent = searchViewModel::onEvent
                         )
                     }
 
                     composable(Route.SEARCH_DETAIL.name) {
-                        Greeting(name = "Search Detail")
+                        SearchItemDetailScreen(
+                            navController = navController,
+                            screenStateFlow = searchViewModel.screenStateFlow
+                        )
                     }
                 }
             }

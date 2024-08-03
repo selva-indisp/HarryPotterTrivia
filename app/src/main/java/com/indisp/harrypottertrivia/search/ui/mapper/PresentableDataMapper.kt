@@ -17,7 +17,7 @@ class PresentableDataMapper {
         for (resultItem in result) {
             presentableResult.add(PresentableSearchResult.Title(resultItem.catalogName))
             for (catalogItem in resultItem.result)
-                presentableResult.add(PresentableSearchResult.ResultItem(toDisplayName(catalogItem)))
+                presentableResult.add(PresentableSearchResult.ResultItem(toDisplayName(catalogItem), catalogItem))
         }
         return presentableResult.toPersistentList()
     }

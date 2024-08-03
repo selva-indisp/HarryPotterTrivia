@@ -58,6 +58,8 @@ espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "esp
 mockk = { module = "io.mockk:mockk", version = "1.13.10" }
 turbine = { module = "app.cash.turbine:turbine", version = "1.1.0" }
 
+coil = { module = "io.coil-kt:coil-compose", version = "2.6.0"}
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

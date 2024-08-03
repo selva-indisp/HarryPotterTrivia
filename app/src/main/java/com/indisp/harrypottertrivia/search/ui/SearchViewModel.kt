@@ -28,7 +28,7 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private companion object {
-        val INITIAL_STATE = State(searchQuery = "", searchResult = persistentListOf())
+        val INITIAL_STATE = State(searchQuery = "", searchResult = persistentListOf(), selectedCatalog = null)
     }
     private var isScreenInitialized = false
     private val _screenStateFlow = MutableStateFlow(INITIAL_STATE)
@@ -46,7 +46,6 @@ class SearchViewModel(
 
     private suspend fun observeSearchResult() {
         searchUseCase.searchResultFlow.collectLatest { result ->
-            Log.d("PRODBUG", "observeSearchResult: $this\n$result")
             _screenStateFlow.update { it.copy(searchResult = mapper.toDisplayResult(result)) }
         }
     }
@@ -70,13 +69,18 @@ class SearchViewModel(
                 _screenStateFlow.update { it.copy(searchQuery = event.query) }
                 _searchQueryFlow.update { event.query }
             }
-            is Event.OnSearchResultClicked -> _sideEffectFlow.update { SideEffect.NavigateToCatalogDetails }
+            is Event.OnSearchResultClicked -> {
+                Log.d("PRODBUG", "onEvent: OnSearchResultClicked - ${event.catalog}")
+                _screenStateFlow.update { it.copy(selectedCatalog = event.catalog) }
+                _sideEffectFlow.update { SideEffect.NavigateToCatalogDetails }
+            }
         }
     }
 
     data class State(
         val searchQuery: String,
-        val searchResult: PersistentList<PresentableSearchResult>
+        val searchResult: PersistentList<PresentableSearchResult>,
+        val selectedCatalog: Catalog?
     )
 
     sealed interface Event {

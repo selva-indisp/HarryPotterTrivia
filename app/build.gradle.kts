@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.navigation)
     implementation(libs.compose.activity)
+    implementation(libs.coil)
 
     implementation(libs.room)
     kapt(libs.room.compiler)

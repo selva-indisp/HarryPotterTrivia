@@ -46,7 +46,7 @@ dependencies {
     implementation(libs.compose.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.activity)
-
+    implementation(libs.compose.navigation)
     implementation(libs.ktx.core)
     implementation(libs.ktx.lifecycle)
 }
