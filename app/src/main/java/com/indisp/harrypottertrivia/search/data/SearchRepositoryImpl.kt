@@ -26,14 +26,10 @@ class SearchRepositoryImpl(
 ): SearchRepository {
 
     override suspend fun searchBook(query: String): List<Book> {
-        val cached = bookDao.search(query)
-        if (cached.isNotEmpty())
-            return cached.map(entityToDomainMapper::toBook)
-
         return when(val response = apiService.searchBook(query)) {
             is Result.Error -> {
                 Log.d("PRODBUG", "searchBook: $${response.error}")
-                emptyList()
+                bookDao.search(query).map(entityToDomainMapper::toBook)
             }
             is Result.Success -> {
                 val books = response.data.map(dtoToEntityMapper::toBook)
@@ -45,14 +41,10 @@ class SearchRepositoryImpl(
     }
 
     override suspend fun searchCharacter(query: String): List<Character> {
-        val cached = characterDao.search(query)
-        if (cached.isNotEmpty())
-            return cached.map(entityToDomainMapper::toCharacter)
-
         return when(val response = apiService.searchCharacter(query)) {
             is Result.Error -> {
                 Log.d("PRODBUG", "searchBook: $${response.error}")
-                emptyList()
+                characterDao.search(query).map(entityToDomainMapper::toCharacter)
             }
             is Result.Success -> {
                 val characters = response.data.map(dtoToEntityMapper::toCharacter)
@@ -64,14 +56,10 @@ class SearchRepositoryImpl(
     }
 
     override suspend fun searchHouse(query: String): List<House> {
-        val cached = houseDao.search(query)
-        if (cached.isNotEmpty())
-            return cached.map(entityToDomainMapper::toHouse)
-
         return when(val response = apiService.searchHouse(query)) {
             is Result.Error -> {
                 Log.d("PRODBUG", "searchBook: $${response.error}")
-                emptyList()
+                houseDao.search(query).map(entityToDomainMapper::toHouse)
             }
             is Result.Success -> {
                 val house = response.data.map(dtoToEntityMapper::toHouse)
@@ -83,14 +71,10 @@ class SearchRepositoryImpl(
     }
 
     override suspend fun searchSpell(query: String): List<Spell> {
-        val cached = spellDao.search(query)
-        if (cached.isNotEmpty())
-            return cached.map(entityToDomainMapper::toSpell)
-
         return when(val response = apiService.searchSpell(query)) {
             is Result.Error -> {
                 Log.d("PRODBUG", "searchBook: $${response.error}")
-                emptyList()
+                spellDao.search(query).map(entityToDomainMapper::toSpell)
             }
             is Result.Success -> {
                 val lastShownSpellId = spellDao.getLastShownSpell()?.id

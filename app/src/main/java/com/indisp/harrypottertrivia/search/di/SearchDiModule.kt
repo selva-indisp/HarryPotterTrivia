@@ -24,7 +24,7 @@ val searchDiModule = module {
     viewModel<SearchViewModel> {
         SearchViewModel(get(), get(), DefaultDispatcher, get())
     }
-    factory { SearchUseCase(get()) }
+    factory { SearchUseCase(get(), DefaultDispatcher) }
     factory { GetRandomSpellUseCase(get()) }
     factory { PresentableDataMapper() }
 }

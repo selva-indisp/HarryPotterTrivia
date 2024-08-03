@@ -44,7 +44,7 @@ class SearchViewModel(
         _searchQueryFlow
             .debounce(1000L)
             .distinctUntilChanged()
-            .collectLatest { query -> searchUseCase(query) }
+            .collectLatest { query -> searchUseCase(query, viewModelScope) }
     }
 
     private suspend fun observeSearchResult() {
