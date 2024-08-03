@@ -48,7 +48,7 @@ val searchDataDiModule = module {
             DtoToEntityMapper()
         )
     }
-    factory<SearchApiService> { SearchApiServiceImpl(get()) }
+    factory<SearchApiService> { SearchApiServiceImpl(get(), get()) }
     factory<BookDao> { get<MainDatabase>().bookDao() }
     factory<CharacterDao> { get<MainDatabase>().characterDao() }
     factory<HouseDao> { get<MainDatabase>().houseDao() }

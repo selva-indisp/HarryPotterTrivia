@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">HarryPotterTrivia</string>
+    <string name="search_hint">Buscar por nombre de hechizo/libro/personaje</string>
+</resources>
