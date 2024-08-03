@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -44,9 +45,10 @@ class SearchViewModel(
 
     private suspend fun observeSearchQuery() {
         _searchQueryFlow
+            .filter { it.length > 2 }
             .debounce(1000L)
             .distinctUntilChanged()
-            .collectLatest { query -> searchUseCase(query, viewModelScope) }
+            .collectLatest { query -> _screenStateFlow.update { it.copy(isLoading = true) }; searchUseCase(query, viewModelScope) }
     }
 
     private suspend fun observeSearchResult() {
@@ -97,7 +99,7 @@ class SearchViewModel(
             Event.OnErrorShown -> resetSideEffect()
             Event.OnNavigatedToCatalogDetails -> resetSideEffect()
             is Event.OnSearchQueryChanged -> {
-                _screenStateFlow.update { it.copy(searchQuery = event.query, isLoading = true) }
+                _screenStateFlow.update { it.copy(searchQuery = event.query) }
                 _searchQueryFlow.update { event.query }
             }
 

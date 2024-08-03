@@ -59,6 +59,6 @@ data class SearchUseCase(
 }
 
 sealed interface SearchQueryResult {
-    data class SearchResultFound(val data: List<SearchResult>) : SearchQueryResult
+    class SearchResultFound(val data: List<SearchResult>) : SearchQueryResult
     class NoItemsFound : SearchQueryResult
 }
