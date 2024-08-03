@@ -4,13 +4,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.indisp.designsystem.theme.DsTheme
+import com.indisp.harrypottertrivia.navigation.Route
+import com.indisp.harrypottertrivia.search.ui.SearchScreen
+import com.indisp.harrypottertrivia.search.ui.SearchViewModel
+import org.koin.androidx.compose.koinViewModel
+
+private const val ANIM_DURATION = 300
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,11 +26,47 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = Route.SEARCH_SCREEN.name,
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Left,
+                            tween(ANIM_DURATION)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Left,
+                            tween(ANIM_DURATION)
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Right,
+                            tween(ANIM_DURATION)
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Right,
+                            tween(ANIM_DURATION)
+                        )
+                    },
+                ) {
+                    composable(Route.SEARCH_SCREEN.name) {
+                        val searchViewModel: SearchViewModel = koinViewModel()
+                        SearchScreen(
+                            screenStateFlow = searchViewModel.screenStateFlow,
+                            sideEffectFlow = searchViewModel.sideEffectFlow,
+                            onEvent = searchViewModel::onEvent
+                        )
+                    }
+
+                    composable(Route.SEARCH_DETAIL.name) {
+                        Greeting(name = "Search Detail")
+                    }
                 }
             }
         }

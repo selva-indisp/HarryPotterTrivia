@@ -11,6 +11,7 @@ internal val networkClient = HttpClient(CIO) {
         json(Json {
             prettyPrint = true
             isLenient = true
+            ignoreUnknownKeys = true
         })
     }
 }

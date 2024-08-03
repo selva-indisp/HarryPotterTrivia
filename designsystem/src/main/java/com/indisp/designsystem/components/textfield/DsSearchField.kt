@@ -1,10 +1,6 @@
 package com.indisp.designsystem.components.textfield
 
 import android.util.Log
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -17,7 +13,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun DsSearchField(
     value: String,
-    onBackPressed: () -> Unit,
+    hint: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -34,18 +30,8 @@ fun DsSearchField(
         value = value,
         onValueChange = onValueChange,
         inputType = DsTextInputType.Search,
-        hint = "Search by coin name or symbol",
+        hint = hint,
         focusRequester = focusRequester,
-        prefix = {
-            IconButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    onBackPressed()
-                }
-            ) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "")
-            }
-        },
         onDone = { focusManager.clearFocus() }
     )
 }

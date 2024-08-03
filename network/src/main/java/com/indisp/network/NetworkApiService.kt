@@ -1,5 +1,6 @@
 package com.indisp.network
 
+import android.util.Log
 import com.indisp.core.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -11,6 +12,7 @@ class NetworkApiService(
     val client: HttpClient
 ) {
     suspend inline fun <reified S> get(url: String): Result<S, NetworkFailure> {
+        Log.d("PRODBUG:API", "get: $url")
         return try {
             Result.Success(client.get(url).body<S>())
         } catch (e: UnresolvedAddressException) {
