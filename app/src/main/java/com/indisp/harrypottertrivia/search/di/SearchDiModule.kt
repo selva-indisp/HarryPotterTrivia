@@ -2,6 +2,8 @@ package com.indisp.harrypottertrivia.search.di
 
 import androidx.room.Room
 import com.indisp.core.DefaultDispatcher
+import com.indisp.core.ResourceProvider
+import com.indisp.core.ResourceProviderImpl
 import com.indisp.harrypottertrivia.search.data.SearchRepositoryImpl
 import com.indisp.harrypottertrivia.search.data.local.MainDatabase
 import com.indisp.harrypottertrivia.search.data.local.dao.BookDao
@@ -22,7 +24,7 @@ import org.koin.dsl.module
 
 val searchDiModule = module {
     viewModel<SearchViewModel> {
-        SearchViewModel(get(), get(), DefaultDispatcher, get())
+        SearchViewModel(get(), get(), DefaultDispatcher, ResourceProviderImpl(get()), get())
     }
     factory { SearchUseCase(get(), DefaultDispatcher) }
     factory { GetRandomSpellUseCase(get()) }

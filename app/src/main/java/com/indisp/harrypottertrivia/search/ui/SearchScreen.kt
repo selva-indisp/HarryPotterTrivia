@@ -18,12 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.indisp.designsystem.components.composable.LifecycleObserver
 import com.indisp.designsystem.components.text.DsText
 import com.indisp.designsystem.components.text.DsTextType
 import com.indisp.designsystem.components.textfield.DsSearchField
 import com.indisp.designsystem.resource.Size
+import com.indisp.harrypottertrivia.R
 import com.indisp.harrypottertrivia.navigation.Route
 import com.indisp.harrypottertrivia.search.domain.model.Catalog
 import com.indisp.harrypottertrivia.search.domain.model.Spell
@@ -64,7 +67,9 @@ fun SearchScreen(
 
     Scaffold { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
         ) {
             DsSearchField(
                 modifier = Modifier.padding(
@@ -76,14 +81,24 @@ fun SearchScreen(
                 onValueChange = { query ->
                     onEvent(Event.OnSearchQueryChanged(query))
                 },
-                hint = "Search by spell/book/character name"
+                isLoading = state.isLoading,
+                hint = stringResource(id = R.string.search_hint)
             )
             val modifier = Modifier.padding(padding)
-            if (state.searchResult.isNotEmpty())
+            if (state.errorMessage.isNotEmpty())
+                ErrorComp(message = state.errorMessage)
+            else if (state.searchResult.isNotEmpty())
                 SearchResultList(result = state.searchResult, modifier = modifier) { onEvent(Event.OnSearchResultClicked(it))}
             else
                 state.randomSpell?.run { SpellComp(spell = this) }
         }
+    }
+}
+
+@Composable
+private fun ErrorComp(message: String, modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
+        DsText(text = message, type = DsTextType.Error, align = TextAlign.Center, modifier = modifier.fillMaxSize())
     }
 }
 
@@ -96,7 +111,7 @@ private fun SpellComp(spell: Spell, modifier: Modifier = Modifier) {
     ) {
         DsText(text = spell.name, type = DsTextType.Title)
         Spacer(modifier = Modifier.height(Size.large))
-        DsText(text = spell.use, type = DsTextType.Primary())
+        DsText(text = spell.use, type = DsTextType.Primary(), align = TextAlign.Center)
     }
 }
 

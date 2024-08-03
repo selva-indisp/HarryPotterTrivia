@@ -34,6 +34,7 @@ fun DsTextField(
     enabled: Boolean = true,
     focusRequester: FocusRequester = remember { FocusRequester() },
     prefix: @Composable () -> Unit = {},
+    suffix: @Composable () -> Unit = {},
     onDone: () -> Unit = {}
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -83,7 +84,8 @@ fun DsTextField(
                 onDone()
             }
         ),
-        prefix = prefix
+        prefix = prefix,
+        suffix = suffix
     )
 }
 

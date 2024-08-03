@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">HarryPotterTrivia</string>
     <string name="search_hint">Search by spell/book/character name</string>
+    <string name="no_items_found">No items found</string>
 </resources>

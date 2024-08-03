@@ -1,19 +1,19 @@
 package com.indisp.harrypottertrivia.search.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.indisp.core.DispatcherProvider
+import com.indisp.core.ResourceProvider
+import com.indisp.harrypottertrivia.R
 import com.indisp.harrypottertrivia.search.domain.model.Catalog
-import com.indisp.harrypottertrivia.search.domain.model.SearchResult
 import com.indisp.harrypottertrivia.search.domain.model.Spell
 import com.indisp.harrypottertrivia.search.domain.usecase.GetRandomSpellUseCase
+import com.indisp.harrypottertrivia.search.domain.usecase.SearchQueryResult
 import com.indisp.harrypottertrivia.search.domain.usecase.SearchUseCase
 import com.indisp.harrypottertrivia.search.ui.mapper.PresentableDataMapper
 import com.indisp.harrypottertrivia.search.ui.model.PresentableSearchResult
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,12 +27,14 @@ class SearchViewModel(
     private val searchUseCase: SearchUseCase,
     private val getRandomSpellUseCase: GetRandomSpellUseCase,
     private val dispatcherProvider: DispatcherProvider,
+    private val resourceProvider: ResourceProvider,
     private val mapper: PresentableDataMapper
 ) : ViewModel() {
 
     private companion object {
         val INITIAL_STATE = State(searchQuery = "", searchResult = persistentListOf())
     }
+
     private var isScreenInitialized = false
     private val _screenStateFlow = MutableStateFlow(INITIAL_STATE)
     val screenStateFlow: StateFlow<State> = _screenStateFlow.asStateFlow()
@@ -49,7 +51,25 @@ class SearchViewModel(
 
     private suspend fun observeSearchResult() {
         searchUseCase.searchResultFlow.collectLatest { result ->
-            _screenStateFlow.update { it.copy(searchResult = mapper.toDisplayResult(result)) }
+            when (result) {
+                is SearchQueryResult.SearchResultFound -> _screenStateFlow.update {
+                    it.copy(
+                        searchResult = mapper.toDisplayResult(result.data),
+                        errorMessage = "",
+                        isLoading = false
+                    )
+                }
+
+                is SearchQueryResult.NoItemsFound -> _screenStateFlow.update {
+                    it.copy(
+                        searchResult = persistentListOf(),
+                        errorMessage = resourceProvider.getString(
+                            R.string.no_items_found
+                        ),
+                        isLoading = false
+                    )
+                }
+            }
         }
     }
 
@@ -64,17 +84,24 @@ class SearchViewModel(
                     isScreenInitialized = true
                     viewModelScope.launch(dispatcherProvider.IO) { observeSearchQuery() }
                     viewModelScope.launch(dispatcherProvider.IO) { observeSearchResult() }
-                    viewModelScope.launch(dispatcherProvider.IO) { _screenStateFlow.update { it.copy(randomSpell = getRandomSpellUseCase()) } }
+                    viewModelScope.launch(dispatcherProvider.IO) {
+                        _screenStateFlow.update {
+                            it.copy(
+                                randomSpell = getRandomSpellUseCase()
+                            )
+                        }
+                    }
                 }
             }
+
             Event.OnErrorShown -> resetSideEffect()
             Event.OnNavigatedToCatalogDetails -> resetSideEffect()
             is Event.OnSearchQueryChanged -> {
-                _screenStateFlow.update { it.copy(searchQuery = event.query) }
+                _screenStateFlow.update { it.copy(searchQuery = event.query, isLoading = true) }
                 _searchQueryFlow.update { event.query }
             }
+
             is Event.OnSearchResultClicked -> {
-                Log.d("PRODBUG", "onEvent: OnSearchResultClicked - ${event.catalog}")
                 _screenStateFlow.update { it.copy(selectedCatalog = event.catalog) }
                 _sideEffectFlow.update { SideEffect.NavigateToCatalogDetails }
             }
@@ -84,14 +111,16 @@ class SearchViewModel(
     data class State(
         val searchQuery: String,
         val searchResult: PersistentList<PresentableSearchResult>,
+        val isLoading: Boolean = false,
         val selectedCatalog: Catalog? = null,
-        val randomSpell: Spell? = null
+        val randomSpell: Spell? = null,
+        val errorMessage: String = ""
     )
 
     sealed interface Event {
         object OnScreenCreated : Event
-        object OnErrorShown: Event
-        object OnNavigatedToCatalogDetails: Event
+        object OnErrorShown : Event
+        object OnNavigatedToCatalogDetails : Event
         data class OnSearchQueryChanged(val query: String) : Event
         data class OnSearchResultClicked(val catalog: Catalog) : Event
     }
