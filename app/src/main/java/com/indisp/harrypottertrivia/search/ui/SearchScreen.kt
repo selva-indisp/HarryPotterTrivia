@@ -46,7 +46,6 @@ fun SearchScreen(
     onEvent: (Event) -> Unit
 ) {
     val state by screenStateFlow.collectAsState()
-    val context = LocalContext.current
 
     LifecycleObserver(
         onCreate = { onEvent(Event.OnScreenCreated) }
@@ -60,7 +59,6 @@ fun SearchScreen(
                     onEvent(Event.OnNavigatedToCatalogDetails)
                     navController.navigate(Route.SEARCH_DETAIL.name)
                 }
-                is SideEffect.ShowError -> { Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show() }
             }
         }
     }

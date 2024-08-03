@@ -45,10 +45,9 @@ class SearchViewModel(
 
     private suspend fun observeSearchQuery() {
         _searchQueryFlow
-            .filter { it.length > 2 }
             .debounce(1000L)
             .distinctUntilChanged()
-            .collectLatest { query -> _screenStateFlow.update { it.copy(isLoading = true) }; searchUseCase(query, viewModelScope) }
+            .collectLatest { query -> searchUseCase(query, viewModelScope) }
     }
 
     private suspend fun observeSearchResult() {
@@ -71,6 +70,8 @@ class SearchViewModel(
                         isLoading = false
                     )
                 }
+
+                is SearchQueryResult.Searching -> _screenStateFlow.update { it.copy(isLoading = true) };
             }
         }
     }
@@ -129,7 +130,6 @@ class SearchViewModel(
 
     sealed interface SideEffect {
         object Idle : SideEffect
-        data class ShowError(val message: String) : SideEffect
         object NavigateToCatalogDetails : SideEffect
     }
 }

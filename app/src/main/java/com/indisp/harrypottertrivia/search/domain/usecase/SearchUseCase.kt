@@ -23,11 +23,12 @@ data class SearchUseCase(
 
     operator fun invoke(query: String, scope: CoroutineScope) =
         scope.launch(dispatcherProvider.IO) {
-            if (query.isEmpty()) {
+            if (query.length < 3) {
                 _searchResultFlow.update { INIT_VALUE }
                 return@launch
             }
 
+            _searchResultFlow.update { SearchQueryResult.Searching() }
             val booksJob = async { searchRepository.searchBook(query) }
             val charactersJob = async { searchRepository.searchCharacter(query) }
             val spellsJob = async { searchRepository.searchSpell(query) }
@@ -61,4 +62,5 @@ data class SearchUseCase(
 sealed interface SearchQueryResult {
     class SearchResultFound(val data: List<SearchResult>) : SearchQueryResult
     class NoItemsFound : SearchQueryResult
+    class Searching : SearchQueryResult
 }
