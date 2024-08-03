@@ -8,12 +8,15 @@ import com.indisp.harrypottertrivia.search.data.local.entity.SpellEntity
 
 @Dao
 interface SpellDao {
-    @Query("SELECT * FROM spellentity")
-    suspend fun getAll(): List<SpellEntity>
+    @Query("SELECT * FROM spellentity WHERE isLastShown = 1")
+    suspend fun getLastShownSpell(): SpellEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entity: List<SpellEntity>)
 
     @Query("SELECT * FROM spellentity WHERE (LOWER(name) LIKE '%' || LOWER(:name) || '%')")
     suspend fun search(name: String): List<SpellEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(entity: SpellEntity)
 }

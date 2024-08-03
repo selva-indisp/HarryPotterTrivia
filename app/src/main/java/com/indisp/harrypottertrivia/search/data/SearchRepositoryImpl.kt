@@ -93,11 +93,27 @@ class SearchRepositoryImpl(
                 emptyList()
             }
             is Result.Success -> {
-                val spells = response.data.map(dtoToEntityMapper::toSpell)
+                val lastShownSpellId = spellDao.getLastShownSpell()?.id
+                val spells = response.data.map { dtoToEntityMapper.toSpell(it, lastShownSpellId) }
                 spellDao.insertAll(spells)
                 val cachedData = spellDao.search(query)
                 cachedData.map(entityToDomainMapper::toSpell)
             }
         }
+    }
+
+    override suspend fun getRandomSpell(): Spell? {
+        val cached = spellDao.getLastShownSpell()
+
+        val randomSpell = when (val response = apiService.getRandomSpell()) {
+            is Result.Error -> cached
+            is Result.Success -> {
+                cached?.run { spellDao.insert(copy(isLastShown = false)) }
+                val spellEntity = dtoToEntityMapper.toSpell(response.data, cached?.id).copy(isLastShown = true)
+                spellDao.insert(spellEntity)
+                spellEntity
+            }
+        }
+        return if (randomSpell != null) entityToDomainMapper.toSpell(randomSpell) else null
     }
 }

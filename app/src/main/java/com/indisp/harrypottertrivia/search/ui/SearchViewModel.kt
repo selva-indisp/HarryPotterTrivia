@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.indisp.core.DispatcherProvider
 import com.indisp.harrypottertrivia.search.domain.model.Catalog
 import com.indisp.harrypottertrivia.search.domain.model.SearchResult
+import com.indisp.harrypottertrivia.search.domain.model.Spell
+import com.indisp.harrypottertrivia.search.domain.usecase.GetRandomSpellUseCase
 import com.indisp.harrypottertrivia.search.domain.usecase.SearchUseCase
 import com.indisp.harrypottertrivia.search.ui.mapper.PresentableDataMapper
 import com.indisp.harrypottertrivia.search.ui.model.PresentableSearchResult
@@ -23,12 +25,13 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchUseCase: SearchUseCase,
+    private val getRandomSpellUseCase: GetRandomSpellUseCase,
     private val dispatcherProvider: DispatcherProvider,
     private val mapper: PresentableDataMapper
 ) : ViewModel() {
 
     private companion object {
-        val INITIAL_STATE = State(searchQuery = "", searchResult = persistentListOf(), selectedCatalog = null)
+        val INITIAL_STATE = State(searchQuery = "", searchResult = persistentListOf())
     }
     private var isScreenInitialized = false
     private val _screenStateFlow = MutableStateFlow(INITIAL_STATE)
@@ -61,6 +64,7 @@ class SearchViewModel(
                     isScreenInitialized = true
                     viewModelScope.launch(dispatcherProvider.IO) { observeSearchQuery() }
                     viewModelScope.launch(dispatcherProvider.IO) { observeSearchResult() }
+                    viewModelScope.launch(dispatcherProvider.IO) { _screenStateFlow.update { it.copy(randomSpell = getRandomSpellUseCase()) } }
                 }
             }
             Event.OnErrorShown -> resetSideEffect()
@@ -80,7 +84,8 @@ class SearchViewModel(
     data class State(
         val searchQuery: String,
         val searchResult: PersistentList<PresentableSearchResult>,
-        val selectedCatalog: Catalog?
+        val selectedCatalog: Catalog? = null,
+        val randomSpell: Spell? = null
     )
 
     sealed interface Event {

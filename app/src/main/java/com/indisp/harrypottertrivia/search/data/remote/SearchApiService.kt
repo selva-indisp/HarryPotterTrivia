@@ -13,6 +13,7 @@ interface SearchApiService {
     suspend fun searchCharacter(query: String): Result<List<CharacterDto>, NetworkFailure>
     suspend fun searchSpell(query: String): Result<List<SpellDto>, NetworkFailure>
     suspend fun searchHouse(query: String): Result<List<HouseDto>, NetworkFailure>
+    suspend fun getRandomSpell(): Result<SpellDto, NetworkFailure>
 }
 
 class SearchApiServiceImpl(
@@ -36,6 +37,10 @@ class SearchApiServiceImpl(
 
     override suspend fun searchHouse(query: String): Result<List<HouseDto>, NetworkFailure> {
         return networkApiService.get("$BASE_URL/houses?search=$query")
+    }
+
+    override suspend fun getRandomSpell(): Result<SpellDto, NetworkFailure> {
+        return networkApiService.get("$BASE_URL/spells/random")
     }
 
 }

@@ -30,11 +30,16 @@ class DtoToEntityMapper {
         coverImageUrl = dto.coverImageUrl
     )
 
-    fun toSpell(dto: SpellDto) = SpellEntity(
-        id = dto.id ?: -1,
-        name = dto.name,
-        use = dto.use
-    )
+    fun toSpell(dto: SpellDto, lastShownSpellId: Int?): SpellEntity {
+        val isLastShown = if (lastShownSpellId == null) false else dto.id == lastShownSpellId
+
+        return SpellEntity(
+            id = dto.id ?: -1,
+            name = dto.name,
+            use = dto.use,
+            isLastShown = isLastShown
+        )
+    }
 
     fun toHouse(dto: HouseDto) = HouseEntity(
         id = dto.id ?: -1,

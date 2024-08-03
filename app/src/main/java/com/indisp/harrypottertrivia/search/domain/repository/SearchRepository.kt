@@ -10,4 +10,5 @@ interface SearchRepository {
     suspend fun searchCharacter(query: String): List<Character>
     suspend fun searchHouse(query: String): List<House>
     suspend fun searchSpell(query: String): List<Spell>
+    suspend fun getRandomSpell(): Spell?
 }

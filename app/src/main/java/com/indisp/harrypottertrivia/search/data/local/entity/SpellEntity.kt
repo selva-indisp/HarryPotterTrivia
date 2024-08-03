@@ -8,5 +8,6 @@ data class SpellEntity(
     @PrimaryKey
     val id: Int,
     val name: String?,
-    val use: String?
+    val use: String?,
+    val isLastShown: Boolean?
 )

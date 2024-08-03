@@ -13,6 +13,7 @@ import com.indisp.harrypottertrivia.search.data.mapper.EntityToDomainMapper
 import com.indisp.harrypottertrivia.search.data.remote.SearchApiService
 import com.indisp.harrypottertrivia.search.data.remote.SearchApiServiceImpl
 import com.indisp.harrypottertrivia.search.domain.repository.SearchRepository
+import com.indisp.harrypottertrivia.search.domain.usecase.GetRandomSpellUseCase
 import com.indisp.harrypottertrivia.search.domain.usecase.SearchUseCase
 import com.indisp.harrypottertrivia.search.ui.SearchViewModel
 import com.indisp.harrypottertrivia.search.ui.mapper.PresentableDataMapper
@@ -21,10 +22,10 @@ import org.koin.dsl.module
 
 val searchDiModule = module {
     viewModel<SearchViewModel> {
-        SearchViewModel(get(), DefaultDispatcher, get())
+        SearchViewModel(get(), get(), DefaultDispatcher, get())
     }
-
     factory { SearchUseCase(get()) }
+    factory { GetRandomSpellUseCase(get()) }
     factory { PresentableDataMapper() }
 }
 
